@@ -1,0 +1,31 @@
+{
+  "feature_order": [
+    "difficulty",
+    "importance",
+    "performance",
+    "study_hours"
+  ],
+  "target": "academic_performance_score",
+  "random_state": 42,
+  "dataset_source": "simulated",
+  "target_bounds": [
+    0,
+    100
+  ],
+  "train_test_split": {
+    "test_size": 0.2,
+    "random_state": 42
+  },
+  "model_config": {
+    "objective": "reg:squarederror",
+    "n_estimators": 300,
+    "max_depth": 4,
+    "learning_rate": 0.05,
+    "subsample": 0.8,
+    "colsample_bytree": 0.8,
+    "random_state": 42
+  },
+  "xgboost_version": "3.4.1",
+  "sklearn_version": "1.9.0",
+  "pandas_version": "2.3.3"
+}

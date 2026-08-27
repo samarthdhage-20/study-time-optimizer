@@ -1,0 +1,12 @@
+{
+  "metrics": {
+    "MAE": 3.9698,
+    "RMSE": 5.0499,
+    "R2": 0.8818
+  },
+  "dataset_source": "simulated",
+  "rows": 5000,
+  "train_rows": 4000,
+  "test_rows": 1000,
+  "random_state": 42
+}

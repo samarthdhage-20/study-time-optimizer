@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Academic Study-Time Optimizer</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/theme.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/form-loader.js') }}" defer></script>
+
+</head>
+
+
+<body>
+
+<header>
+    <div class="site-nav"><span class="brand-mark">AO</span><span class="brand-name">ACADEMIC OPTIMIZATION</span><button type="button" class="theme-toggle" data-theme-toggle aria-label="Toggle color theme" aria-pressed="false"><span class="theme-icon">◐</span><span class="theme-label">Dark mode</span></button></div>
+    <div class="hero-content"><p class="eyebrow">AI + Operations Research</p><h1>Intelligent Study-Time Allocation</h1><p class="hero-subtitle">Build a data-informed study plan with priority scoring, linear optimization, and experimental performance prediction.</p></div>
+</header>
+
+
+<main>
+
+{% if error %}
+    <section class="form-container" role="alert">
+        <p>{{ error }}</p>
+    </section>
+{% endif %}
+
+<div class="progress-strip"><span class="progress-step is-current"><b>01</b> Student inputs</span><i>→</i><span class="progress-step"><b>02</b> Optimization</span><i>→</i><span class="progress-step"><b>03</b> Results</span></div>
+
+<form action="/submit" method="POST" data-optimizer-form>
+
+
+    <!-- STUDENT INFORMATION -->
+
+    <section class="form-container">
+
+        <h2>1. Student Information</h2>
+
+
+        <div class="form-group">
+
+            <label for="student_name">
+                Student Name
+            </label>
+
+            <input
+                type="text"
+                id="student_name"
+                name="student_name"
+                placeholder="Enter your name"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="study_hours">
+                Available Study Hours Per Day
+            </label>
+
+            <input
+                type="number"
+                id="study_hours"
+                name="study_hours"
+                min="1"
+                max="24"
+                step="0.5"
+                placeholder="Example: 5"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="exam_days">
+                Days Remaining Until Examination
+            </label>
+
+            <input
+                type="number"
+                id="exam_days"
+                name="exam_days"
+                min="1"
+                placeholder="Example: 30"
+                required
+            >
+
+        </div>
+
+    </section>
+
+
+
+    <!-- SUBJECT DETAILS -->
+
+    <section class="form-container">
+
+        <h2>2. Subject Details</h2>
+
+        <p class="description">
+
+            Rate each subject based on difficulty,
+            importance, and your current performance.
+
+        </p>
+
+
+        <!-- SUBJECT 1 -->
+
+        <div class="subject-card">
+
+            <h3>Subject 1</h3>
+
+
+            <div class="form-group">
+
+                <label>
+                    Subject Name
+                </label>
+
+                <input
+                    type="text"
+                    name="subject_name[]"
+                    placeholder="Example: DSA"
+                    required
+                >
+
+            </div>
+
+
+            <div class="subject-grid">
+
+                <div class="form-group">
+
+                    <label>
+                        Difficulty (1-5)
+                    </label>
+
+                    <input
+                        type="number"
+                        name="difficulty[]"
+                        min="1"
+                        max="5"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Importance (1-5)
+                    </label>
+
+                    <input
+                        type="number"
+                        name="importance[]"
+                        min="1"
+                        max="5"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Current Performance (1-5)
+                    </label>
+
+                    <input
+                        type="number"
+                        name="performance[]"
+                        min="1"
+                        max="5"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="subject-grid">
+
+                <div class="form-group">
+
+                    <label>
+                        Minimum Study Hours
+                    </label>
+
+                    <input
+                        type="number"
+                        name="min_hours[]"
+                        min="0"
+                        step="0.5"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Maximum Study Hours
+                    </label>
+
+                    <input
+                        type="number"
+                        name="max_hours[]"
+                        min="0.5"
+                        step="0.5"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- SUBJECT 2 -->
+
+        <div class="subject-card">
+
+            <h3>Subject 2</h3>
+
+            <div class="form-group">
+
+                <label>Subject Name</label>
+
+                <input
+                    type="text"
+                    name="subject_name[]"
+                    placeholder="Example: DBMS"
+                    required
+                >
+
+            </div>
+
+
+            <div class="subject-grid">
+
+                <div class="form-group">
+
+                    <label>Difficulty (1-5)</label>
+
+                    <input
+                        type="number"
+                        name="difficulty[]"
+                        min="1"
+                        max="5"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Importance (1-5)</label>
+
+                    <input
+                        type="number"
+                        name="importance[]"
+                        min="1"
+                        max="5"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Current Performance (1-5)</label>
+
+                    <input
+                        type="number"
+                        name="performance[]"
+                        min="1"
+                        max="5"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="subject-grid">
+
+                <div class="form-group">
+
+                    <label>Minimum Study Hours</label>
+
+                    <input
+                        type="number"
+                        name="min_hours[]"
+                        min="0"
+                        step="0.5"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Maximum Study Hours</label>
+
+                    <input
+                        type="number"
+                        name="max_hours[]"
+                        min="0.5"
+                        step="0.5"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- SUBJECT 3 -->
+
+        <div class="subject-card">
+
+            <h3>Subject 3</h3>
+
+            <div class="form-group">
+
+                <label>Subject Name</label>
+
+                <input
+                    type="text"
+                    name="subject_name[]"
+                    placeholder="Example: Operating Systems"
+                    required
+                >
+
+            </div>
+
+
+            <div class="subject-grid">
+
+                <div class="form-group">
+
+                    <label>Difficulty (1-5)</label>
+
+                    <input
+                        type="number"
+                        name="difficulty[]"
+                        min="1"
+                        max="5"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Importance (1-5)</label>
+
+                    <input
+                        type="number"
+                        name="importance[]"
+                        min="1"
+                        max="5"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Current Performance (1-5)</label>
+
+                    <input
+                        type="number"
+                        name="performance[]"
+                        min="1"
+                        max="5"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="subject-grid">
+
+                <div class="form-group">
+
+                    <label>Minimum Study Hours</label>
+
+                    <input
+                        type="number"
+                        name="min_hours[]"
+                        min="0"
+                        step="0.5"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Maximum Study Hours</label>
+
+                    <input
+                        type="number"
+                        name="max_hours[]"
+                        min="0.5"
+                        step="0.5"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- SUBJECT 4 -->
+
+        <div class="subject-card">
+
+            <h3>Subject 4</h3>
+
+            <div class="form-group">
+
+                <label>Subject Name</label>
+
+                <input
+                    type="text"
+                    name="subject_name[]"
+                    placeholder="Example: Computer Networks"
+                    required
+                >
+
+            </div>
+
+
+            <div class="subject-grid">
+
+                <div class="form-group">
+
+                    <label>Difficulty (1-5)</label>
+
+                    <input
+                        type="number"
+                        name="difficulty[]"
+                        min="1"
+                        max="5"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Importance (1-5)</label>
+
+                    <input
+                        type="number"
+                        name="importance[]"
+                        min="1"
+                        max="5"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Current Performance (1-5)</label>
+
+                    <input
+                        type="number"
+                        name="performance[]"
+                        min="1"
+                        max="5"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="subject-grid">
+
+                <div class="form-group">
+
+                    <label>Minimum Study Hours</label>
+
+                    <input
+                        type="number"
+                        name="min_hours[]"
+                        min="0"
+                        step="0.5"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Maximum Study Hours</label>
+
+                    <input
+                        type="number"
+                        name="max_hours[]"
+                        min="0.5"
+                        step="0.5"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- SUBJECT 5 -->
+
+        <div class="subject-card">
+
+            <h3>Subject 5</h3>
+
+            <div class="form-group">
+
+                <label>Subject Name</label>
+
+                <input
+                    type="text"
+                    name="subject_name[]"
+                    placeholder="Example: Mathematics"
+                    required
+                >
+
+            </div>
+
+
+            <div class="subject-grid">
+
+                <div class="form-group">
+
+                    <label>Difficulty (1-5)</label>
+
+                    <input
+                        type="number"
+                        name="difficulty[]"
+                        min="1"
+                        max="5"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Importance (1-5)</label>
+
+                    <input
+                        type="number"
+                        name="importance[]"
+                        min="1"
+                        max="5"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Current Performance (1-5)</label>
+
+                    <input
+                        type="number"
+                        name="performance[]"
+                        min="1"
+                        max="5"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="subject-grid">
+
+                <div class="form-group">
+
+                    <label>Minimum Study Hours</label>
+
+                    <input
+                        type="number"
+                        name="min_hours[]"
+                        min="0"
+                        step="0.5"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Maximum Study Hours</label>
+
+                    <input
+                        type="number"
+                        name="max_hours[]"
+                        min="0.5"
+                        step="0.5"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <button type="submit" class="primary-action"><span>Optimize Study Plan</span><span class="button-arrow">→</span></button>
+
+    </section>
+
+
+</form>
+
+<div class="loading-overlay" data-loading-overlay aria-live="polite" aria-busy="true">
+    <div class="loader-panel"><div class="loader-orbit"><span></span></div><p class="eyebrow">Intelligent Optimization Engine</p><h2>Preparing your decision dashboard</h2><div class="loader-stages"><p data-loader-stage>Input validation</p><p data-loader-stage>Calculating Study Priority Index</p><p data-loader-stage>Solving Linear Programming model</p><p data-loader-stage>Generating XGBoost prediction</p><p data-loader-stage>Preparing decision dashboard</p></div></div>
+</div>
+
+</main>
+
+</body>
+
+</html>

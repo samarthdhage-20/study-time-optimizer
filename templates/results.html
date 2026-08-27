@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study-Time Optimization Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/theme.js') }}" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}" defer></script>
+</head>
+<body>
+<header>
+    <div class="site-nav"><span class="brand-mark">AO</span><span class="brand-name">ACADEMIC OPTIMIZATION</span><button type="button" class="theme-toggle" data-theme-toggle aria-label="Toggle color theme" aria-pressed="false"><span class="theme-icon">◐</span><span class="theme-label">Dark mode</span></button></div>
+    <div class="hero-content"><p class="eyebrow">Decision Support Dashboard</p><h1>Study-Time Optimization Results</h1><p class="hero-subtitle">A transparent hybrid of prescriptive allocation and experimental prediction.</p></div>
+</header>
+<main>
+    <div class="dashboard-toolbar"><button type="button" class="print-button" onclick="window.print()">Print Results</button></div>
+    <section class="dashboard-section summary-section reveal reveal-1">
+        <div class="section-heading"><div><p class="eyebrow">Daily allocation</p><h2>Optimization Summary</h2></div><span class="status-badge">{{ solver_status }}</span></div>
+        <div class="summary-grid">
+            <div class="summary-card"><span class="summary-label">Available time</span><strong data-count-value="{{ study_hours }}" data-count-decimals="2">0.00</strong><small>hours per day</small></div>
+            <div class="summary-card"><span class="summary-label">Optimized allocation</span><strong data-count-value="{{ total_optimized_hours }}" data-count-decimals="2">0.00</strong><small>hours per day</small></div>
+            <div class="summary-card"><span class="summary-label">Objective value</span><strong data-count-value="{{ objective_function_value }}" data-count-decimals="2">0.00</strong><small>SPI-weighted hours</small></div>
+            <div class="summary-card"><span class="summary-label">Subjects optimized</span><strong data-count-value="{{ subjects|length }}" data-count-decimals="0">0</strong><small>validated subjects</small></div>
+        </div>
+    </section>
+    <section class="dashboard-section form-container reveal reveal-2">
+        <h2>Student Information</h2>
+        <div class="student-details"><p><strong>Name:</strong> {{ student_name }}</p><p><strong>Available Study Hours:</strong> {{ "%.2f"|format(study_hours) }} hours/day</p><p><strong>Days Until Examination:</strong> {{ exam_days }}</p></div>
+    </section>
+    <section class="dashboard-section form-container reveal reveal-3">
+        <div class="section-heading"><div><p class="eyebrow">Prescriptive and predictive outputs</p><h2>Hybrid Results</h2></div></div>
+        <p class="experimental-notice">Experimental prediction: This XGBoost model was trained on simulated academic data for prototype evaluation and has not been validated using real student academic records.</p>
+        {% if prediction_error %}<p class="prediction-alert" role="alert">{{ prediction_error }}</p>{% endif %}
+        <div class="charts-grid reveal reveal-4"><div class="chart-card"><h3>Optimized Study Hours</h3><div class="chart-container"><canvas id="hoursChart"></canvas></div></div><div class="chart-card"><h3>Predicted Academic Performance</h3><div class="chart-container"><canvas id="performanceChart"></canvas></div></div></div>
+        <div class="table-wrapper reveal reveal-4"><table><thead><tr><th>Subject</th><th>SPI</th><th>Minimum Hours</th><th>Maximum Hours</th><th>Optimized Study Hours</th><th>Predicted Academic Performance</th></tr></thead><tbody>
+        {% for subject in subjects %}<tr><td>{{ subject.name }}</td><td>{{ "%.2f"|format(subject.spi) }}</td><td>{{ "%.2f"|format(subject.min_hours) }}</td><td>{{ "%.2f"|format(subject.max_hours) }}</td><td>{{ "%.2f"|format(subject.optimized_hours) }}</td><td>{% if subject.predicted_performance is not none %}{{ "%.2f"|format(subject.predicted_performance) }} / 100{% else %}Unavailable{% endif %}</td></tr>{% endfor %}
+        </tbody></table></div>
+    </section>
+    <section class="dashboard-section form-container explanation-section reveal reveal-5"><p class="eyebrow">Allocation rationale</p><h2>Why This Allocation?</h2><p class="section-intro">The LP prioritizes subjects by SPI while respecting each subject's bounds and the shared daily time limit.</p><div class="explanation-list">
+        {% for explanation in allocation_explanations %}<div class="explanation-item"><div class="explanation-rank">{{ explanation.rank }}</div><p><strong>{{ explanation.name }}</strong> receives <strong>{{ "%.2f"|format(explanation.optimized_hours) }} hours/day</strong> (SPI {{ "%.2f"|format(explanation.spi) }}), {{ explanation.state }}.</p></div>{% endfor %}
+    </div></section>
+    <section class="dashboard-section form-container methodology-section reveal reveal-6"><p class="eyebrow">How the hybrid method works</p><h2>Hybrid Methodology</h2><div class="methodology-flow">
+        <div class="method-step"><span>1</span><strong>Student Inputs</strong></div><div class="flow-arrow">→</div><div class="method-step"><span>2</span><strong>SPI Calculation</strong></div><div class="flow-arrow">→</div><div class="method-step"><span>3</span><strong>PuLP Linear Programming</strong></div><div class="flow-arrow">→</div><div class="method-step"><span>4</span><strong>Optimized Study Hours</strong></div><div class="flow-arrow">→</div><div class="method-step"><span>5</span><strong>XGBoost Prediction</strong></div><div class="flow-arrow">→</div><div class="method-step"><span>6</span><strong>Final Results</strong></div>
+    </div><p class="methodology-note">PuLP produces the allocation first. XGBoost then predicts performance from those optimized subject hours; predictions do not change the LP.</p></section>
+    <div class="dashboard-actions"><a href="/">&#8592; Go Back and Edit Data</a></div>
+</main>
+<script>window.dashboardData = {{ dashboard_data|tojson }};</script>
+</body>
+</html>
