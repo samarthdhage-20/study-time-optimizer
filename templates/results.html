@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Study-Time Optimization Results</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <script src="{{ url_for('static', filename='js/theme.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
     <script src="{{ url_for('static', filename='js/dashboard.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/assistant.js') }}" defer></script>
 </head>
 <body>
 <header>
@@ -33,7 +34,18 @@
         <div class="section-heading"><div><p class="eyebrow">Prescriptive and predictive outputs</p><h2>Hybrid Results</h2></div></div>
         <p class="experimental-notice">Experimental prediction: This XGBoost model was trained on simulated academic data for prototype evaluation and has not been validated using real student academic records.</p>
         {% if prediction_error %}<p class="prediction-alert" role="alert">{{ prediction_error }}</p>{% endif %}
-        <div class="charts-grid reveal reveal-4"><div class="chart-card"><h3>Optimized Study Hours</h3><div class="chart-container"><canvas id="hoursChart"></canvas></div></div><div class="chart-card"><h3>Predicted Academic Performance</h3><div class="chart-container"><canvas id="performanceChart"></canvas></div></div></div>
+        <div class="analytics-heading"><p class="eyebrow">Study time optimization analytics</p><h3>How the allocation respects your constraints</h3></div>
+        <div class="charts-grid reveal reveal-4">
+            <div class="chart-card"><h3>Optimized Study Hours</h3><div class="chart-container"><canvas id="hoursChart"></canvas></div></div>
+            <div class="chart-card"><h3>Minimum vs Optimized vs Maximum</h3><div class="chart-container"><canvas id="minMaxChart"></canvas></div></div>
+            <div class="chart-card"><h3>Priority Ranking (SPI)</h3><div class="chart-container"><canvas id="priorityChart"></canvas></div></div>
+            <div class="chart-card"><h3>Study-Time Distribution</h3><div class="chart-container"><canvas id="distributionChart"></canvas><div class="chart-empty" id="distributionEmpty">Chart data unavailable.</div></div></div>
+        </div>
+        <div class="analytics-heading performance-heading"><p class="eyebrow">Performance analytics</p><h3>Current baseline and experimental outlook</h3></div>
+        <div class="charts-grid reveal reveal-4">
+            <div class="chart-card"><h3>Predicted Academic Performance</h3><div class="chart-container"><canvas id="performanceChart"></canvas></div></div>
+            <div class="chart-card"><h3>Current vs Predicted Performance</h3><div class="chart-container"><canvas id="comparisonChart"></canvas></div><p class="chart-note">Current performance is converted from the 1–5 rating scale to a 0–100 equivalent for visualization only.</p></div>
+        </div>
         <div class="table-wrapper reveal reveal-4"><table><thead><tr><th>Subject</th><th>SPI</th><th>Minimum Hours</th><th>Maximum Hours</th><th>Optimized Study Hours</th><th>Predicted Academic Performance</th></tr></thead><tbody>
         {% for subject in subjects %}<tr><td>{{ subject.name }}</td><td>{{ "%.2f"|format(subject.spi) }}</td><td>{{ "%.2f"|format(subject.min_hours) }}</td><td>{{ "%.2f"|format(subject.max_hours) }}</td><td>{{ "%.2f"|format(subject.optimized_hours) }}</td><td>{% if subject.predicted_performance is not none %}{{ "%.2f"|format(subject.predicted_performance) }} / 100{% else %}Unavailable{% endif %}</td></tr>{% endfor %}
         </tbody></table></div>
@@ -47,5 +59,15 @@
     <div class="dashboard-actions"><a href="/">&#8592; Go Back and Edit Data</a></div>
 </main>
 <script>window.dashboardData = {{ dashboard_data|tojson }};</script>
+<script>window.assistantData = {{ assistant_data|tojson }};</script>
+<div class="assistant-root" data-assistant-root>
+    <button class="assistant-fab" type="button" data-assistant-toggle aria-label="Open Study Optimization Assistant"><span>✦</span><b>Assistant</b></button>
+    <section class="assistant-panel" data-assistant-panel aria-label="Study Optimization Assistant" aria-hidden="true">
+        <div class="assistant-header"><div><span class="assistant-avatar">✦</span><div><strong>Study Optimization Assistant</strong><small>Explains your calculated results</small></div></div><button type="button" class="assistant-close" data-assistant-close aria-label="Close assistant">×</button></div>
+        <div class="assistant-messages" data-assistant-messages><div class="assistant-message assistant-message-bot">Hi! I can explain your study allocation, SPI, optimization results, or experimental predictions.</div></div>
+        <div class="assistant-chips" data-assistant-chips><button type="button">Explain my results</button><button type="button">What is SPI?</button><button type="button">Highest priority?</button><button type="button">Why did a subject get more time?</button></div>
+        <form class="assistant-form" data-assistant-form><label class="sr-only" for="assistantInput">Ask the assistant</label><input id="assistantInput" data-assistant-input type="text" autocomplete="off" placeholder="Ask about your results…"><button type="submit" aria-label="Send question">➤</button></form>
+    </section>
+</div>
 </body>
 </html>

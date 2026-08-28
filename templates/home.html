@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Time Optimizer | Intelligent Allocation</title>
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/home.js') }}" defer></script>
+</head>
+<body class="home-page">
+<div class="scroll-progress" data-scroll-progress aria-hidden="true"></div>
+<nav class="home-nav" aria-label="Primary navigation">
+    <a class="home-brand" href="/"><span class="brand-mark">AO</span><span>Study Time Optimizer</span></a>
+    <button class="mobile-menu-button" type="button" aria-label="Open navigation menu" aria-expanded="false" data-menu-toggle>☰</button>
+    <div class="home-nav-links" data-nav-links>
+        <a href="/">Home</a><a href="#how-it-works">How It Works</a><a href="#technology">Technology</a>
+        <a class="nav-cta" href="{{ url_for('optimize') }}">Optimize Now <span>→</span></a>
+        <button type="button" class="theme-toggle theme-toggle-dark" data-theme-toggle aria-label="Toggle color theme" aria-pressed="false"><span class="theme-icon">◐</span><span class="theme-label">Dark mode</span></button>
+    </div>
+</nav>
+
+<main>
+<section class="home-hero">
+    <div class="hero-copy"><p class="eyebrow">AI + OPERATIONS RESEARCH</p><h1>Study Smarter.<br><em>Allocate Time Intelligently.</em></h1><p class="hero-lead">A hybrid decision-support system that uses Linear Programming to optimize daily study-time allocation and XGBoost to generate experimental academic performance insights.</p><div class="hero-actions"><a class="hero-primary" href="{{ url_for('optimize') }}">Optimize My Study Plan <span>→</span></a><a class="hero-secondary" href="#how-it-works">Explore How It Works <span>↓</span></a></div><div class="hero-proof"><span>◉</span><span>Constraint-aware</span><span>·</span><span>Data-informed</span><span>·</span><span>Prototype-ready</span></div></div>
+    <div class="system-visual" aria-label="Optimization pipeline illustration">
+        <div class="visual-orbit orbit-one"></div><div class="visual-orbit orbit-two"></div>
+        <div class="pipeline-node node-input"><span>01</span><strong>Student Data</strong><small>5 subject profiles</small></div>
+        <div class="pipeline-line line-one"></div><div class="pipeline-node node-spi"><span>02</span><strong>Priority Analysis</strong><small>SPI scoring engine</small></div>
+        <div class="pipeline-line line-two"></div><div class="pipeline-node node-lp"><span>03</span><strong>PuLP Optimization</strong><small>Constraint solver</small></div>
+        <div class="pipeline-line line-three"></div><div class="pipeline-node node-result"><span>04</span><strong>Actionable Insights</strong><small>Allocation + prediction</small></div>
+    </div>
+</section>
+
+<section class="home-section intro-section" id="how-it-works"><div class="section-kicker">A better way to plan</div><h2>From scattered hours to a <span>structured advantage.</span></h2><p>Turn your constraints, priorities, and goals into a study plan you can actually follow.</p><div class="feature-grid"><article class="feature-card"><div class="feature-icon">◎</div><h3>Priority-led planning</h3><p>Subjects are ranked with the Study Priority Index, balancing difficulty, importance, and performance gap.</p></article><article class="feature-card"><div class="feature-icon">⌘</div><h3>Constraint-aware allocation</h3><p>PuLP Linear Programming distributes available time while respecting every minimum and maximum bound.</p></article><article class="feature-card"><div class="feature-icon">↗</div><h3>Experimental insights</h3><p>XGBoost estimates academic performance from optimized subject-level study hours.</p></article><article class="feature-card"><div class="feature-icon">◌</div><h3>Transparent decisions</h3><p>See exactly why each subject received its allocation through a clear, ranked explanation.</p></article></div></section>
+
+<section class="home-section process-section"><div class="section-kicker">The workflow</div><h2>One clear path from input to insight.</h2><div class="home-timeline"><div><b>01</b><strong>Enter Study Details</strong><small>Tell us about your time and subjects.</small></div><i>→</i><div><b>02</b><strong>Calculate SPI</strong><small>Measure each subject's priority.</small></div><i>→</i><div><b>03</b><strong>Optimize with PuLP</strong><small>Find the best feasible allocation.</small></div><i>→</i><div><b>04</b><strong>Generate Allocation</strong><small>Translate variables into hours.</small></div><i>→</i><div><b>05</b><strong>Predict with XGBoost</strong><small>Generate experimental insights.</small></div><i>→</i><div><b>06</b><strong>View Results</strong><small>Understand the decision.</small></div></div></section>
+
+<section class="home-section hybrid-section"><div class="hybrid-copy"><div class="section-kicker">The hybrid method</div><h2>Prescriptive optimization.<br><span>Predictive perspective.</span></h2><p>One system combines a rigorous allocation engine with a forward-looking experimental model.</p><div class="hybrid-points"><p><b>PuLP</b> determines the optimized allocation.</p><p><b>XGBoost</b> uses optimized subject hours as an input.</p><p><b>Sequential by design:</b> prediction never modifies the LP.</p></div></div><div class="hybrid-diagram"><div class="diagram-column"><div>Student Inputs</div><span>↓</span><div>SPI Calculation</div><span>↓</span><div>PuLP Linear Programming</div><span>↓</span><div class="diagram-highlight">Optimized Study Hours</div></div><div class="diagram-bridge">→</div><div class="diagram-column"><div class="diagram-highlight">Optimized Study Hours</div><span>↓</span><div>XGBoost Model</div><span>↓</span><div>Experimental Performance Insight</div></div></div></section>
+
+<section class="home-section preview-section"><div class="preview-heading"><div><div class="section-kicker">Your decision dashboard</div><h2>Clarity after every calculation.</h2></div><span class="preview-tag">ILLUSTRATIVE PREVIEW</span></div><div class="mock-dashboard"><div class="mock-top"><span>Optimization Summary</span><b>● Optimal</b></div><div class="mock-metrics"><div><small>Available time</small><strong>8.00</strong><em>hours/day</em></div><div><small>Optimized allocation</small><strong>8.00</strong><em>hours/day</em></div><div><small>Objective value</small><strong>34.00</strong><em>SPI-weighted</em></div></div><div class="mock-body"><div class="mock-chart"><small>Optimized study hours</small><div class="mock-bars"><i style="height:78%"></i><i style="height:46%"></i><i style="height:60%"></i><i style="height:36%"></i><i style="height:88%"></i></div></div><div class="mock-subjects"><small>Priority allocation</small><p><span>DSA</span><b>2.50 h</b></p><p><span>DBMS</span><b>1.50 h</b></p><p><span>Mathematics</span><b>2.00 h</b></p></div></div></div><p class="preview-note">Illustrative dashboard visuals — values shown are examples, not actual user results.</p></section>
+
+<section class="home-section tech-section" id="technology"><div class="section-kicker">Built for the project</div><h2>Technology with purpose.</h2><div class="tech-grid"><div><b>Python</b><span>Backend application</span></div><div><b>Flask</b><span>Web framework</span></div><div><b>PuLP</b><span>Linear optimization</span></div><div><b>XGBoost</b><span>Experimental prediction</span></div><div><b>Chart.js</b><span>Data visualization</span></div><div><b>HTML / CSS / JS</b><span>User interface</span></div></div><div class="home-disclaimer"><span>ⓘ</span><p><strong>Experimental predictive layer.</strong> XGBoost was trained using simulated academic data for prototype evaluation. Predictions are not validated real-world academic forecasts.</p></div></section>
+
+<section class="home-cta"><div><p class="eyebrow">Ready to begin?</p><h2>Turn available hours into a smarter plan.</h2><p>Structured, mathematically optimized, and transparent from input to insight.</p></div><a class="hero-primary" href="{{ url_for('optimize') }}">Start Optimization <span>→</span></a></section>
+</main>
+<footer class="home-footer"><div><a class="home-brand" href="/"><span class="brand-mark">AO</span><span>Study Time Optimizer</span></a><p>A hybrid AI + Operations Research decision-support system.</p></div><div class="footer-links"><a href="#how-it-works">How It Works</a><a href="#technology">Technology</a><a href="{{ url_for('optimize') }}">Optimize Now</a></div><div class="footer-meta">Built with Flask, PuLP and XGBoost<br><small>Predictions are experimental and simulation-based.</small></div></footer>
+</body>
+</html>

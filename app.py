@@ -11,6 +11,11 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
+    return render_template("home.html")
+
+
+@app.route("/optimize")
+def optimize():
     return render_template("index.html")
 
 
@@ -240,7 +245,13 @@ def submit():
     dashboard_data = [
         {
             "name": subject["name"],
+            "difficulty": subject["difficulty"],
+            "importance": subject["importance"],
+            "performance": subject["performance"],
+            "performance_gap": subject["performance_gap"],
             "spi": subject["spi"],
+            "min_hours": subject["min_hours"],
+            "max_hours": subject["max_hours"],
             "optimized_hours": subject["optimized_hours"],
             "predicted_performance": subject["predicted_performance"],
         }
@@ -281,6 +292,13 @@ def submit():
         prediction_error=prediction_error,
         dashboard_data=dashboard_data,
         allocation_explanations=allocation_explanations,
+        assistant_data={
+            "subjects": dashboard_data,
+            "solver_status": solver_status,
+            "available_hours": available_study_hours,
+            "total_optimized_hours": total_optimized_hours,
+            "objective_value": objective_function_value,
+        },
     )
 
 if __name__ == "__main__":

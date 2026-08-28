@@ -2,38 +2,27 @@
     const charts = [];
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    function colors() {
+    function palette() {
         const dark = document.documentElement.dataset.theme === "dark";
-        return { text: dark ? "#cbd5e1" : "#334155", grid: dark ? "#1e3a5f" : "#e2e8f0", blue: dark ? "#60a5fa" : "#2563eb", cyan: dark ? "#22d3ee" : "#0f766e" };
+        return { text: dark ? "#cbd5e1" : "#334155", grid: dark ? "#1e3a5f" : "#e2e8f0", blue: dark ? "#60a5fa" : "#2563eb", cyan: dark ? "#22d3ee" : "#0f766e", slate: dark ? "#94a3b8" : "#64748b" };
     }
+
+    function validRows() { return Array.isArray(window.dashboardData) ? window.dashboardData.filter((row) => row && typeof row.name === "string") : []; }
+    function baseOptions(colors, legend) { return { responsive: true, maintainAspectRatio: false, animation: reducedMotion ? false : { duration: 800, easing: "easeOutQuart" }, plugins: { legend: { display: legend, labels: { color: colors.text, usePointStyle: true, padding: 16 } }, tooltip: { backgroundColor: "#0f172a", padding: 12, cornerRadius: 8 } }, scales: { x: { ticks: { color: colors.text }, grid: { display: false } }, y: { beginAtZero: true, ticks: { color: colors.text }, grid: { color: colors.grid } } } }; }
+    function emptyState(id, show) { const empty = document.getElementById(id); const canvas = empty && empty.parentElement.querySelector("canvas"); if (empty) empty.classList.toggle("is-visible", show); if (canvas) canvas.style.display = show ? "none" : "block"; }
+    function addChart(id, type, data, options) { const canvas = document.getElementById(id); if (canvas) charts.push(new Chart(canvas, { type, data, options })); }
 
     function drawCharts() {
-        if (typeof Chart === "undefined" || !Array.isArray(window.dashboardData)) return;
-        charts.forEach((chart) => chart.destroy());
-        charts.length = 0;
-        const palette = colors();
-        const labels = window.dashboardData.map((item) => item.name);
-        const hours = window.dashboardData.map((item) => item.optimized_hours);
-        const performance = window.dashboardData.map((item) => item.predicted_performance);
-        const base = { responsive: true, maintainAspectRatio: false, animation: reducedMotion ? false : { duration: 900, easing: "easeOutQuart" }, plugins: { legend: { display: false }, tooltip: { backgroundColor: "#0f172a", padding: 12, cornerRadius: 8 } }, scales: { x: { ticks: { color: palette.text }, grid: { display: false } }, y: { beginAtZero: true, ticks: { color: palette.text }, grid: { color: palette.grid } } } };
-        const hoursCanvas = document.getElementById("hoursChart");
-        if (hoursCanvas) charts.push(new Chart(hoursCanvas, { type: "bar", data: { labels, datasets: [{ data: hours, backgroundColor: palette.blue, hoverBackgroundColor: palette.cyan, borderRadius: 8, borderSkipped: false }] }, options: { ...base, scales: { ...base.scales, y: { ...base.scales.y, title: { display: true, text: "Hours per day", color: palette.text } } } } }));
-        const performanceCanvas = document.getElementById("performanceChart");
-        if (performanceCanvas) charts.push(new Chart(performanceCanvas, { type: "bar", data: { labels, datasets: [{ data: performance, backgroundColor: palette.cyan, hoverBackgroundColor: palette.blue, borderRadius: 8, borderSkipped: false }] }, options: { ...base, scales: { ...base.scales, y: { ...base.scales.y, max: 100, title: { display: true, text: "Score (0–100)", color: palette.text } } } } }));
+        if (typeof Chart === "undefined") return;
+        charts.forEach((chart) => chart.destroy()); charts.length = 0;
+        const rows = validRows(); const colors = palette(); const labels = rows.map((row) => row.name); const base = baseOptions(colors, false);
+        addChart("hoursChart", "bar", { labels, datasets: [{ label: "Optimized hours/day", data: rows.map((row) => row.optimized_hours), backgroundColor: colors.blue, borderRadius: 7 }] }, { ...base, scales: { ...base.scales, y: { ...base.scales.y, title: { display: true, text: "Hours per day", color: colors.text } } } });
+        addChart("minMaxChart", "bar", { labels, datasets: [{ label: "Minimum", data: rows.map((row) => row.min_hours), backgroundColor: colors.slate }, { label: "Optimized", data: rows.map((row) => row.optimized_hours), backgroundColor: colors.blue }, { label: "Maximum", data: rows.map((row) => row.max_hours), backgroundColor: colors.cyan }] }, baseOptions(colors, true));
+        addChart("priorityChart", "bar", { labels, datasets: [{ label: "SPI", data: rows.map((row) => row.spi), backgroundColor: colors.blue, borderRadius: 7 }] }, { ...base, indexAxis: "y", scales: { x: { beginAtZero: true, max: 5, ticks: { color: colors.text }, grid: { color: colors.grid }, title: { display: true, text: "Study Priority Index", color: colors.text } }, y: base.scales.x } });
+        const total = rows.reduce((sum, row) => sum + (Number.isFinite(Number(row.optimized_hours)) ? Number(row.optimized_hours) : 0), 0); const doughnutValid = rows.length > 0 && Number.isFinite(total) && total > 0; emptyState("distributionEmpty", !doughnutValid); if (doughnutValid) addChart("distributionChart", "doughnut", { labels, datasets: [{ data: rows.map((row) => row.optimized_hours), backgroundColor: [colors.blue, colors.cyan, "#818cf8", "#38bdf8", "#a78bfa"], borderColor: document.documentElement.dataset.theme === "dark" ? "#0b1a33" : "#fff", borderWidth: 3 }] }, { responsive: true, maintainAspectRatio: false, animation: reducedMotion ? false : { duration: 900 }, plugins: { legend: { position: "bottom", labels: { color: colors.text, usePointStyle: true } }, tooltip: { callbacks: { label: (context) => `${context.label}: ${Number(context.raw).toFixed(2)} hours (${((Number(context.raw) / total) * 100).toFixed(1)}%)` } } } });
+        addChart("performanceChart", "bar", { labels, datasets: [{ label: "Predicted score", data: rows.map((row) => row.predicted_performance), backgroundColor: colors.cyan, borderRadius: 7 }] }, { ...base, scales: { ...base.scales, y: { ...base.scales.y, max: 100, title: { display: true, text: "Score (0–100)", color: colors.text } } } });
+        const comparisonRows = rows.filter((row) => Number.isFinite(Number(row.performance)) && Number.isFinite(Number(row.predicted_performance))); const comparisonCanvas = document.getElementById("comparisonChart"); if (comparisonCanvas) { if (!comparisonRows.length) { comparisonCanvas.style.display = "none"; const note = comparisonCanvas.parentElement.querySelector(".chart-empty"); if (note) note.classList.add("is-visible"); } else { comparisonCanvas.style.display = "block"; addChart("comparisonChart", "bar", { labels: comparisonRows.map((row) => row.name), datasets: [{ label: "Current equivalent (0–100)", data: comparisonRows.map((row) => (Number(row.performance) / 5) * 100), backgroundColor: colors.slate }, { label: "Predicted performance", data: comparisonRows.map((row) => row.predicted_performance), backgroundColor: colors.cyan }] }, { ...baseOptions(colors, true), scales: { ...base.scales, y: { ...base.scales.y, max: 100, title: { display: true, text: "Score (0–100)", color: colors.text } } } }); } }
     }
-
-    function countUp() {
-        document.querySelectorAll("[data-count-value]").forEach((element) => {
-            const target = Number(element.dataset.countValue);
-            const decimals = Number(element.dataset.countDecimals || 0);
-            if (reducedMotion || !Number.isFinite(target)) { element.textContent = target.toFixed(decimals); return; }
-            const start = performance.now();
-            const tick = (now) => { const progress = Math.min((now - start) / 850, 1); const eased = 1 - Math.pow(1 - progress, 3); element.textContent = (target * eased).toFixed(decimals); if (progress < 1) requestAnimationFrame(tick); };
-            requestAnimationFrame(tick);
-        });
-    }
-
-    function reveal() { document.querySelectorAll(".reveal").forEach((element) => element.classList.add("is-revealed")); }
-    document.addEventListener("DOMContentLoaded", () => { countUp(); reveal(); drawCharts(); });
-    document.addEventListener("themechange", drawCharts);
+    function countUp() { document.querySelectorAll("[data-count-value]").forEach((element) => { const target = Number(element.dataset.countValue); const decimals = Number(element.dataset.countDecimals || 0); if (reducedMotion || !Number.isFinite(target)) { element.textContent = target.toFixed(decimals); return; } const start = performance.now(); const tick = (now) => { const progress = Math.min((now - start) / 850, 1); element.textContent = (target * (1 - Math.pow(1 - progress, 3))).toFixed(decimals); if (progress < 1) requestAnimationFrame(tick); }; requestAnimationFrame(tick); }); }
+    document.addEventListener("DOMContentLoaded", () => { countUp(); document.querySelectorAll(".reveal").forEach((element) => element.classList.add("is-revealed")); drawCharts(); }); document.addEventListener("themechange", drawCharts);
 }());
