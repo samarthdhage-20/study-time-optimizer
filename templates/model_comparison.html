@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Machine Learning Model Comparative Analysis</title>
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script src="{{ url_for('static', filename='js/model_comparison.js') }}" defer></script>
+</head>
+<body class="comparison-page">
+<header>
+    <div class="site-nav"><a class="home-brand" href="/"><span class="brand-mark">AO</span><span class="brand-name">Study Time Optimizer</span></a><a class="comparison-back" href="/optimize">Optimize</a><button type="button" class="theme-toggle" data-theme-toggle aria-label="Toggle color theme" aria-pressed="false"><span class="theme-icon">◐</span><span class="theme-label">Dark mode</span></button></div>
+    <div class="hero-content"><p class="eyebrow">Experimental Research Prototype</p><h1>Machine Learning Model Comparative Analysis</h1><p class="hero-subtitle">Experimental evaluation of regression algorithms for academic performance prediction.</p></div>
+</header>
+<main>
+{% if comparison_error %}
+    <section class="comparison-empty form-container"><div class="empty-icon">⌁</div><h2>Comparison results are not available yet.</h2><p>{{ comparison_error }}</p><code>.\venv\Scripts\python.exe -m ml.compare_models</code></section>
+{% else %}
+    <section class="comparison-section comparison-summary">
+        <div class="section-heading"><div><p class="eyebrow">Executive summary</p><h2>One dataset. Five fair benchmarks.</h2></div><span class="status-badge">Simulated dataset</span></div>
+        <div class="comparison-metrics">
+            <div class="comparison-metric"><small>Dataset size</small><strong>{{ comparison_report.dataset_rows }}</strong><span>rows</span></div>
+            <div class="comparison-metric"><small>Models compared</small><strong>{{ comparison_report.models|length }}</strong><span>regressors</span></div>
+            <div class="comparison-metric"><small>Features</small><strong>{{ comparison_report.features|length }}</strong><span>shared inputs</span></div>
+            <div class="comparison-metric"><small>Test dataset</small><strong>{{ comparison_report.test_rows }}</strong><span>held-out rows</span></div>
+            <div class="comparison-metric best-metric"><small>Best-performing model</small><strong>{{ comparison_report.best_model or "Unavailable" }}</strong><span>by R² ranking</span></div>
+            <div class="comparison-metric"><small>Best R² score</small><strong>{{ "%.4f"|format(comparison_report.best_r2) if comparison_report.best_r2 is not none else "—" }}</strong><span>higher is better</span></div>
+        </div>
+    </section>
+    <section class="comparison-section prototype-rationale">
+        <div class="analytics-heading"><p class="eyebrow">Scientific interpretation</p><h2>Why Does the Prototype Use XGBoost?</h2></div>
+        <div class="rationale-cards">
+            <div class="rationale-card winner-card"><span class="rationale-label">Experimental Winner</span><strong>{{ comparison_report.best_model }}</strong><small>Highest R² under this simulated experiment</small></div>
+            <div class="rationale-card model-card"><span class="rationale-label">Prototype Predictive Model</span><strong>XGBoost Regressor</strong><small>Retained for future real-world flexibility</small></div>
+            <div class="rationale-card reason-card"><span class="rationale-label">Key Reason</span><strong>Comparable accuracy</strong><small>with greater nonlinear modelling flexibility</small></div>
+        </div>
+        <div class="research-insight rationale-bridge">Best on Current Simulated Data <span>≠</span> Automatically Best for Future Real-World Data</div>
+        <div class="rationale-copy"><p><strong>Linear Regression is the best-performing model in this specific simulated experiment</strong> according to the defined ranking criteria. The synthetic target was generated using a predominantly linear relationship between difficulty, importance, current performance, study hours, and academic performance score. Linear Regression is therefore naturally well suited to this dataset.</p><p>XGBoost achieved very similar performance, with only a small difference in R², RMSE, and MAE. It is retained as the prototype's experimental predictive model because future real-world academic data may contain nonlinear relationships, diminishing returns from additional study hours, and interactions between difficulty, performance, importance, and study behavior. Future features could include attendance, previous scores, revision frequency, assignments, mock tests, and topic-level performance.</p><p><strong>This is an architectural and future-scalability decision, not a claim that XGBoost won the current experiment.</strong></p></div>
+        <div class="r2-gap-visual"><div class="r2-gap-heading"><strong>R² scores are very close in this experiment</strong><span>Higher is better</span></div><div class="r2-bar-row"><label>Linear Regression</label><div class="r2-track"><i id="linearR2Bar"></i></div><b id="linearR2Value">—</b></div><div class="r2-bar-row"><label>XGBoost</label><div class="r2-track"><i id="xgbR2Bar"></i></div><b id="xgbR2Value">—</b></div><p class="chart-note">The bars are scaled relative to the best R² in this report; they are a visual comparison, not new evaluation metrics.</p></div>
+        <div class="research-insight"><span>✦</span><p><strong>Research Insight:</strong> The comparison experiment evaluates performance on a simulated dataset. Linear Regression achieved the highest score under this controlled setup, while XGBoost delivered comparable performance and offers greater flexibility for modeling potentially nonlinear relationships in future real-world datasets. <strong>Real student academic data and further validation are required before making any real-world claims about model superiority.</strong></p></div>
+    </section>
+    <section class="comparison-section">
+        <div class="analytics-heading"><p class="eyebrow">Analytical comparison</p><h2>How the models perform</h2><p>Raw evaluation metrics are reported directly from the same held-out test set.</p></div>
+        <div class="comparison-chart-grid"><div class="chart-card"><h3>R² Score Comparison <small>Higher is better</small></h3><div class="chart-container"><canvas id="r2Chart"></canvas></div></div><div class="chart-card"><h3>MAE Comparison <small>Lower is better</small></h3><div class="chart-container"><canvas id="maeChart"></canvas></div></div><div class="chart-card"><h3>RMSE Comparison <small>Lower is better</small></h3><div class="chart-container"><canvas id="rmseChart"></canvas></div></div><div class="chart-card"><h3>Training Time Comparison <small>Environment-dependent</small></h3><div class="chart-container"><canvas id="timeChart"></canvas></div><p class="chart-note">Training time depends on the machine, Python environment, and hardware configuration.</p></div><div class="chart-card radar-card"><h3>Overall Model Performance</h3><div class="chart-container"><canvas id="radarChart"></canvas></div><p class="chart-note">Radar values are normalized for visualization only; they are not raw evaluation metrics.</p></div></div>
+    </section>
+    <section class="comparison-section"><div class="section-heading"><div><p class="eyebrow">Transparent evaluation</p><h2>Model Comparison Table</h2></div></div><p class="ranking-note">Ranking method: highest R², then lowest RMSE, then lowest MAE. Training time is reported for context and is not a ranking criterion.</p><div class="table-wrapper"><table class="comparison-table"><thead><tr><th>Rank</th><th>Model</th><th>MAE ↓</th><th>RMSE ↓</th><th>R² ↑</th><th>Training Time (s)</th></tr></thead><tbody>{% for model in comparison_report.models %}<tr class="{% if model.rank == 1 %}top-model{% endif %}"><td>{% if model.rank %}{{ model.rank }}{% else %}—{% endif %}</td><td><strong>{{ model.name }}</strong>{% if model.rank == 1 %}<span class="winner-label">Best in this experiment</span>{% endif %}</td><td>{{ "%.4f"|format(model.mae) if model.mae is defined else "—" }}</td><td>{{ "%.4f"|format(model.rmse) if model.rmse is defined else "—" }}</td><td>{{ "%.4f"|format(model.r2) if model.r2 is defined else "—" }}</td><td>{{ "%.4f"|format(model.training_time_seconds) }}{% if model.status == "failed" %}<small class="model-error">Failed: {{ model.error }}</small>{% endif %}</td></tr>{% endfor %}</tbody></table></div></section>
+    <section class="comparison-section methodology-section"><p class="eyebrow">Experimental fairness</p><h2>Same conditions for every model</h2><div class="comparison-pipeline"><span>Simulated Dataset</span><b>↓</b><span>Same Feature Set</span><b>↓</b><span>Same 80/20 Split</span><b>↓</b><span>Train 5 Models</span><b>↓</b><span>Evaluate on Same Test Data</span><b>↓</b><span>MAE + RMSE + R² + Time</span><b>↓</b><span>Rank Models</span></div><p>All five algorithms use the same features (<code>difficulty</code>, <code>importance</code>, <code>performance</code>, <code>study_hours</code>), target, random seed, preprocessing, and held-out evaluation rows.</p></section>
+    <section class="comparison-section connection-section"><p class="eyebrow">Connection to the optimizer</p><h2>Prescriptive allocation, evaluated prediction.</h2><div class="project-flow"><span>Student Inputs</span><b>→</b><span>SPI</span><b>→</b><span>PuLP</span><b>→</b><span>Optimized Hours</span><b>→</b><span>Current XGBoost Pipeline</span><b>→</b><span>Performance Insight</span></div><p>The comparison is experimental only. The live application continues using its existing XGBoost model and is not automatically replaced by the reported winner.</p></section>
+    <aside class="research-disclaimer"><strong>Research Prototype Disclaimer:</strong> Models are evaluated using simulated academic data. Strong metrics demonstrate performance under these defined experimental conditions and do not establish validated real-world academic prediction accuracy.</aside>
+{% endif %}
+</main>
+<script>window.comparisonReport = {{ comparison_report|tojson }};</script>
+</body>
+</html>

@@ -1,4 +1,6 @@
+import json
 import math
+from pathlib import Path
 
 from flask import Flask, render_template, request
 from pulp import LpMaximize, LpProblem, LpStatus, LpVariable, PULP_CBC_CMD, lpSum, value
@@ -7,6 +9,7 @@ from pulp.apis.core import PulpSolverError
 from ml.predict import predict_performance
 
 app = Flask(__name__)
+COMPARISON_REPORT_PATH = Path(__file__).resolve().parent / "reports" / "model_comparison.json"
 
 
 @app.route("/")
@@ -17,6 +20,24 @@ def home():
 @app.route("/optimize")
 def optimize():
     return render_template("index.html")
+
+
+@app.route("/model-comparison")
+def model_comparison():
+    """Render the offline model comparison without training during a request."""
+    comparison_report = None
+    comparison_error = None
+    try:
+        comparison_report = json.loads(COMPARISON_REPORT_PATH.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        comparison_error = "Model comparison results are not available yet. Run the comparison training pipeline to generate the evaluation report."
+    except (OSError, json.JSONDecodeError):
+        comparison_error = "The model comparison report could not be read. Please regenerate it with the comparison training pipeline."
+    return render_template(
+        "model_comparison.html",
+        comparison_report=comparison_report,
+        comparison_error=comparison_error,
+    )
 
 
 def render_input_error(message):

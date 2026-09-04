@@ -1,0 +1,65 @@
+{
+  "dataset_source": "simulated",
+  "dataset_rows": 5000,
+  "features": [
+    "difficulty",
+    "importance",
+    "performance",
+    "study_hours"
+  ],
+  "target": "academic_performance_score",
+  "test_size": 0.2,
+  "train_rows": 4000,
+  "test_rows": 1000,
+  "random_state": 42,
+  "ranking_method": "Highest R\u00b2, then lowest RMSE, then lowest MAE",
+  "models": [
+    {
+      "name": "Linear Regression",
+      "status": "success",
+      "mae": 3.935624,
+      "rmse": 5.015214,
+      "r2": 0.883381,
+      "training_time_seconds": 0.064202,
+      "rank": 1
+    },
+    {
+      "name": "Gradient Boosting Regressor",
+      "status": "success",
+      "mae": 3.970746,
+      "rmse": 5.052627,
+      "r2": 0.881635,
+      "training_time_seconds": 0.352553,
+      "rank": 2
+    },
+    {
+      "name": "XGBoost Regressor",
+      "status": "success",
+      "mae": 3.986418,
+      "rmse": 5.056199,
+      "r2": 0.881467,
+      "training_time_seconds": 1.07783,
+      "rank": 3
+    },
+    {
+      "name": "Random Forest Regressor",
+      "status": "success",
+      "mae": 4.423641,
+      "rmse": 5.69504,
+      "r2": 0.849622,
+      "training_time_seconds": 1.678321,
+      "rank": 4
+    },
+    {
+      "name": "Decision Tree Regressor",
+      "status": "success",
+      "mae": 5.723335,
+      "rmse": 7.288289,
+      "r2": 0.753713,
+      "training_time_seconds": 0.022173,
+      "rank": 5
+    }
+  ],
+  "best_model": "Linear Regression",
+  "best_r2": 0.883381
+}
